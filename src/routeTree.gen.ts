@@ -16,6 +16,7 @@ import { Route as ArticlesRouteImport } from './routes/articles'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as NewsRouteImport } from './routes/news'
+import { Route as PricesRouteImport } from './routes/prices'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
@@ -56,6 +57,11 @@ const NewsRoute = NewsRouteImport.update({
   path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PricesRoute = PricesRouteImport.update({
+  id: '/prices',
+  path: '/prices',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/news': typeof NewsRoute
+  '/prices': typeof PricesRoute
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/articles/$slug': typeof ArticlesSlugRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/news': typeof NewsRoute
+  '/prices': typeof PricesRoute
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/articles/$slug': typeof ArticlesSlugRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/news': typeof NewsRoute
+  '/prices': typeof PricesRoute
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/articles/$slug': typeof ArticlesSlugRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/login'
     | '/news'
+    | '/prices'
     | '/projects'
     | '/services'
     | '/articles/$slug'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/login'
     | '/news'
+    | '/prices'
     | '/projects'
     | '/services'
     | '/articles/$slug'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/login'
     | '/news'
+    | '/prices'
     | '/projects'
     | '/services'
     | '/articles/$slug'
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   LoginRoute: typeof LoginRoute
   NewsRoute: typeof NewsRoute
+  PricesRoute: typeof PricesRoute
   ProjectsRoute: typeof ProjectsRoute
   ServicesRoute: typeof ServicesRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -223,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prices': {
+      id: '/prices'
+      path: '/prices'
+      fullPath: '/prices'
+      preLoaderRoute: typeof PricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects': {
       id: '/projects'
       path: '/projects'
@@ -274,6 +294,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   LoginRoute: LoginRoute,
   NewsRoute: NewsRoute,
+  PricesRoute: PricesRoute,
   ProjectsRoute: ProjectsRoute,
   ServicesRoute: ServicesRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

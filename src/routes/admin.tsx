@@ -1,19 +1,28 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteShell } from "@/components/shell";
-import { RedirectToSignIn, UserButton } from "@/lib/auth/gates";
-import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import {
   addMedia,
+  adminPrices,
   adminState,
   deleteArticle,
   deleteMedia,
   deleteMember,
+  deletePrice,
   saveArticle,
   saveMember,
+  savePrice,
   saveSettings,
   setHeadlineHidden,
 } from "@/lib/cms.functions";
+import {
+  changePanelPassword,
+  createPanelUser,
+  deletePanelUser,
+  listPanelUsers,
+  panelLogout,
+  panelMe,
+} from "@/lib/panel.functions";
 import { services } from "@/lib/content";
 
 export const Route = createFileRoute("/admin")({
@@ -21,23 +30,32 @@ export const Route = createFileRoute("/admin")({
   component: AdminGate,
 });
 
-type Tab = "settings" | "photos" | "team" | "articles" | "news";
+type Tab = "settings" | "photos" | "team" | "articles" | "news" | "prices" | "accounts";
 
 type State = Awaited<ReturnType<typeof adminState>>;
 
 function AdminGate() {
-  const { user, isPending } = useCurrentUserState();
-  if (isPending) {
+  const navigate = useNavigate();
+  const [ready, setReady] = useState<"wait" | "in" | "out">("wait");
+
+  useEffect(() => {
+    void panelMe()
+      .then((me) => setReady(me.username ? "in" : "out"))
+      .catch(() => setReady("out"));
+  }, []);
+
+  if (ready === "wait") {
     return (
       <SiteShell>
         <p className="px-4 py-16 text-center text-muted">در حال بررسی ورود…</p>
       </SiteShell>
     );
   }
-  if (!user) {
+  if (ready === "out") {
+    void navigate({ to: "/login" });
     return (
       <SiteShell>
-        <RedirectToSignIn to="/login" />
+        <p className="px-4 py-16 text-center text-muted">برای پنل باید وارد شوید.</p>
       </SiteShell>
     );
   }
@@ -68,6 +86,8 @@ function AdminPanel() {
     { id: "team", label: "تیم" },
     { id: "articles", label: "مقاله" },
     { id: "news", label: "خبر" },
+    { id: "prices", label: "قیمت" },
+    { id: "accounts", label: "حساب" },
     { id: "settings", label: "تماس" },
   ];
 
@@ -79,7 +99,16 @@ function AdminPanel() {
             <h1 className="text-2xl font-extrabold">پنل</h1>
             <p className="text-xs text-muted">برای کار در مسیر، دکمه‌ها درشت است.</p>
           </div>
-          <UserButton />
+          <button
+            type="button"
+            className="tap min-h-10 rounded-full border border-line px-3 text-xs"
+            onClick={async () => {
+              await panelLogout();
+              window.location.href = "/login";
+            }}
+          >
+            خروج
+          </button>
         </div>
         {error ? <p className="mt-3 text-sm text-primary">{error}</p> : null}
         {note ? <p className="mt-3 text-sm text-primary">{note}</p> : null}
@@ -90,18 +119,20 @@ function AdminPanel() {
           <Articles state={state} onDone={reload} onNote={setNote} onError={setError} />
         ) : null}
         {state && tab === "news" ? <News state={state} onDone={reload} onError={setError} /> : null}
+        {state && tab === "prices" ? <Prices onNote={setNote} onError={setError} /> : null}
+        {state && tab === "accounts" ? <Accounts onNote={setNote} onError={setError} /> : null}
         {state && tab === "settings" ? (
           <SettingsForm state={state} onDone={reload} onNote={setNote} onError={setError} />
         ) : null}
       </div>
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/95 backdrop-blur">
-        <ul className="mx-auto grid max-w-lg grid-cols-5">
+        <ul className="mx-auto flex max-w-lg overflow-x-auto">
           {tabs.map((item) => (
             <li key={item.id}>
               <button
                 type="button"
                 className={
-                  "tap min-h-14 w-full text-sm " + (tab === item.id ? "text-primary" : "text-muted")
+                  "tap min-h-14 min-w-16 px-2 text-sm " + (tab === item.id ? "text-primary" : "text-muted")
                 }
                 onClick={() => {
                   setNote("");
@@ -469,6 +500,14 @@ function SettingsForm({
         value={form.banner}
         onChange={(e) => set("banner", e.target.value)}
       />
+      <label className="flex min-h-12 items-center gap-3 rounded-xl border border-line px-3 text-sm">
+        <input
+          type="checkbox"
+          checked={Boolean(form.show_prices)}
+          onChange={(e) => setForm((prev) => ({ ...prev, show_prices: e.target.checked }))}
+        />
+        نمایش تب قیمت در سایت
+      </label>
       <button
         type="button"
         className="tap min-h-12 rounded-full bg-primary text-sm font-semibold text-ink"
@@ -485,6 +524,165 @@ function SettingsForm({
       >
         ذخیره
       </button>
+    </section>
+  );
+}
+
+function Prices({
+  onNote,
+  onError,
+}: {
+  onNote: (value: string) => void;
+  onError: (value: string) => void;
+}) {
+  const [items, setItems] = useState<Awaited<ReturnType<typeof adminPrices>>>([]);
+  const [title, setTitle] = useState("");
+  const [unit, setUnit] = useState("");
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+
+  async function load() {
+    setItems(await adminPrices());
+  }
+  useEffect(() => {
+    void load().catch((reason) => onError(reason instanceof Error ? reason.message : "قیمت‌ها خوانده نشد."));
+  }, []);
+
+  return (
+    <section className="mt-5 grid gap-3">
+      <p className="text-sm text-muted">تیک «نمایش تب قیمت» را در بخش تماس بزنید تا این فهرست در سایت دیده شود.</p>
+      <input className={field} placeholder="عنوان، مثلاً بازدید فنی" value={title} onChange={(e) => setTitle(e.target.value)} />
+      <input className={field} placeholder="واحد، مثلاً هر سایت" value={unit} onChange={(e) => setUnit(e.target.value)} />
+      <input className={field} placeholder="مبلغ، مثلاً تماس بگیرید" value={amount} onChange={(e) => setAmount(e.target.value)} />
+      <input className={field} placeholder="توضیح کوتاه" value={note} onChange={(e) => setNote(e.target.value)} />
+      <button
+        type="button"
+        className="tap min-h-12 rounded-full bg-primary text-sm font-semibold text-ink"
+        onClick={async () => {
+          onError("");
+          try {
+            await savePrice({ data: { title, unit, amount, note } });
+            setTitle("");
+            setUnit("");
+            setAmount("");
+            setNote("");
+            onNote("ردیف قیمت ذخیره شد.");
+            await load();
+          } catch (reason) {
+            onError(reason instanceof Error ? reason.message : "ذخیره نشد.");
+          }
+        }}
+      >
+        افزودن ردیف
+      </button>
+      {items.map((item) => (
+        <div key={item.id} className="flex items-center justify-between gap-3 rounded-xl border border-line p-3">
+          <div>
+            <p className="font-semibold">{item.title}</p>
+            <p className="text-sm text-muted">{item.amount}{item.unit ? ` · ${item.unit}` : ""}</p>
+          </div>
+          <button
+            type="button"
+            className="tap min-h-10 rounded-full border border-line px-3 text-xs"
+            onClick={async () => {
+              await deletePrice({ data: item.id });
+              await load();
+            }}
+          >
+            حذف
+          </button>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function Accounts({
+  onNote,
+  onError,
+}: {
+  onNote: (value: string) => void;
+  onError: (value: string) => void;
+}) {
+  const [users, setUsers] = useState<Awaited<ReturnType<typeof listPanelUsers>>>([]);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+
+  async function load() {
+    setUsers(await listPanelUsers());
+  }
+  useEffect(() => {
+    void load().catch((reason) => onError(reason instanceof Error ? reason.message : "حساب‌ها خوانده نشد."));
+  }, []);
+
+  return (
+    <section className="mt-5 grid gap-4">
+      <div className="grid gap-3">
+        <p className="text-sm font-semibold">ساخت حساب مدیر جدید</p>
+        <input className={field} dir="ltr" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input className={field} dir="ltr" type="password" placeholder="رمز، حداقل ۸ نویسه" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <button
+          type="button"
+          className="tap min-h-12 rounded-full bg-primary text-sm font-semibold text-ink"
+          onClick={async () => {
+            onError("");
+            try {
+              await createPanelUser({ data: { username, password } });
+              setUsername("");
+              setPassword("");
+              onNote("حساب ساخته شد.");
+              await load();
+            } catch (reason) {
+              onError(reason instanceof Error ? reason.message : "ساخته نشد.");
+            }
+          }}
+        >
+          ساخت حساب
+        </button>
+      </div>
+      <ul className="grid gap-2">
+        {users.map((user) => (
+          <li key={user.username} className="flex items-center justify-between rounded-xl border border-line px-3 py-2">
+            <span dir="ltr">{user.username}{user.primary_admin ? " · اصلی" : ""}</span>
+            {user.primary_admin ? null : (
+              <button
+                type="button"
+                className="tap min-h-10 rounded-full border border-line px-3 text-xs"
+                onClick={async () => {
+                  await deletePanelUser({ data: user.username });
+                  await load();
+                }}
+              >
+                حذف
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+      <div className="grid gap-3 border-t border-line pt-4">
+        <p className="text-sm font-semibold">تغییر رمز همین حساب</p>
+        <input className={field} dir="ltr" type="password" placeholder="رمز فعلی" value={current} onChange={(e) => setCurrent(e.target.value)} />
+        <input className={field} dir="ltr" type="password" placeholder="رمز جدید" value={next} onChange={(e) => setNext(e.target.value)} />
+        <button
+          type="button"
+          className="tap min-h-12 rounded-full border border-line text-sm"
+          onClick={async () => {
+            onError("");
+            try {
+              await changePanelPassword({ data: { current, next } });
+              setCurrent("");
+              setNext("");
+              onNote("رمز عوض شد.");
+            } catch (reason) {
+              onError(reason instanceof Error ? reason.message : "رمز عوض نشد.");
+            }
+          }}
+        >
+          تغییر رمز
+        </button>
+      </div>
     </section>
   );
 }

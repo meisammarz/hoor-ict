@@ -70,7 +70,7 @@
     display: flex;
     width: max-content;
     gap: 0.75rem;
-    animation: rail 46s linear infinite;
+    animation: rail 32s linear infinite;
   }
 
   .photo-rail:hover .photo-track,
@@ -103,6 +103,41 @@
 
   .photo-card strong {
     font-size: 0.95rem;
+  }
+
+  .glow-frame {
+    position: relative;
+  }
+
+  .glow-frame::before {
+    content: "";
+    position: absolute;
+    inset: -12%;
+    z-index: -1;
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-primary) 35%, transparent), transparent 68%);
+    animation: pulse 6s ease-in-out infinite;
+  }
+
+  .shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 28%) 48%, transparent 62%);
+    transform: translateX(-120%);
+    animation: sheen 4.8s ease-in-out infinite;
+  }
+
+  .card-lift {
+    transition: transform 220ms ease, border-color 220ms ease;
+  }
+
+  .card-lift:hover {
+    transform: translateY(-4px);
   }
 
   .photo-card span {
@@ -140,6 +175,28 @@
   }
 }
 
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes sheen {
+  0%,
+ 55% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -156,7 +213,9 @@
   }
 
   .photo-track,
-  .photo-card img {
+  .photo-card img,
+  .glow-frame::before,
+  .shine::after {
     animation: none;
   }
 }

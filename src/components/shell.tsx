@@ -5,6 +5,14 @@ import { Assistant } from "@/components/assistant";
 import { phones, site } from "@/lib/content";
 import { getSettings } from "@/lib/cms.functions";
 
+function toTel(raw: string) {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return phones[0].tel;
+  if (digits.startsWith("98")) return `+${digits}`;
+  if (digits.startsWith("0")) return `+98${digits.slice(1)}`;
+  return `+${digits}`;
+}
+
 const links = [
   { to: "/", label: "خانه" },
   { to: "/services", label: "خدمات" },
@@ -20,15 +28,21 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [banner, setBanner] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [phone, setPhone] = useState(phones[0].tel);
+  const [showPrices, setShowPrices] = useState(false);
 
   useEffect(() => {
     void getSettings()
       .then((settings) => {
         setBanner(settings.banner);
         setWhatsapp(settings.whatsapp);
+        setShowPrices(Boolean(settings.show_prices));
+        if (settings.phone1) setPhone(toTel(settings.phone1));
       })
       .catch(() => undefined);
   }, []);
+
+  const nav = showPrices ? [...links.slice(0, 2), { to: "/prices", label: "قیمت" }, ...links.slice(2)] : links;
 
   return (
     <div className="min-h-screen bg-bg text-fg">
@@ -51,7 +65,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex" aria-label="اصلی">
-            {links.map((item) => {
+            {nav.map((item) => {
               const active = path === item.to;
               return (
                 <Link
@@ -70,7 +84,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-2">
             <a
-              href={`tel:${phones[0].tel}`}
+              href={`tel:${phone}`}
               className="tap hidden rounded-full bg-primary px-4 py-2 text-sm font-semibold text-ink sm:inline-flex"
             >
               تماس
@@ -91,7 +105,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         {open ? (
           <nav id="mobile-nav" className="border-t border-line px-4 py-3 md:hidden" aria-label="موبایل">
             <ul className="grid gap-1">
-              {links.map((item) => (
+              {nav.map((item) => (
                 <li key={item.to}>
                   <Link
                     to={item.to}

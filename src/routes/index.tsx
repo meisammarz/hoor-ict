@@ -3,14 +3,27 @@ import { ArrowLeft } from "lucide-react";
 import { PhotoRail } from "@/components/photo-rail";
 import { ServiceIcon } from "@/components/service-icon";
 import { SiteShell } from "@/components/shell";
-import { getGallery, listArticles, listNews } from "@/lib/cms.functions";
+import { getGallery, getSettings, listArticles, listNews } from "@/lib/cms.functions";
 import { markets, owners, phones, projects, services, site, steps } from "@/lib/content";
 import { specialtyShots } from "@/lib/shots";
 
+function toTel(raw: string) {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return phones[0].tel;
+  if (digits.startsWith("98")) return `+${digits}`;
+  if (digits.startsWith("0")) return `+98${digits.slice(1)}`;
+  return `+${digits}`;
+}
+
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [gallery, news, articles] = await Promise.all([getGallery(), listNews(), listArticles()]);
-    return { gallery, news: news.slice(0, 3), articles: articles.slice(0, 3) };
+    const [gallery, news, articles, settings] = await Promise.all([
+      getGallery(),
+      listNews(),
+      listArticles(),
+      getSettings(),
+    ]);
+    return { gallery, news: news.slice(0, 3), articles: articles.slice(0, 3), settings };
   },
   head: () => ({
     meta: [{ title: "ارتباطات گستر ایمن حور | زیرساخت ارتباطی و ایمنی" }],
@@ -22,6 +35,8 @@ function Home() {
   const preview = services.slice(0, 8);
   const recent = projects.slice(0, 4);
   const data = Route.useLoaderData();
+  const address = data.settings.address || site.address;
+  const phone = data.settings.phone1 || phones[0].display;
   const shots = [
     ...specialtyShots.map((shot) => ({ ...shot })),
     ...data.gallery
@@ -52,23 +67,22 @@ function Home() {
             ))}
           </div>
           <div className="rise mt-7 flex flex-wrap gap-3">
+            <a
+              href={`tel:${data.settings.phone1 ? toTel(data.settings.phone1) : phones[0].tel}`}
+              className="tap shine inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-ink"
+            >
+              تماس فوری
+            </a>
             <Link
               to="/contact"
-              className="tap inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-ink"
+              className="tap inline-flex min-h-11 items-center rounded-full border border-line bg-surface px-5 text-sm text-fg"
             >
-              درخواست بررسی پروژه
-            </Link>
-            <Link
-              to="/services"
-              className="tap inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface px-5 text-sm text-fg"
-            >
-              کاتالوگ خدمات
-              <ArrowLeft className="size-4" />
+              بازدید و برآورد رایگان
             </Link>
           </div>
         </div>
 
-        <figure className="rise lg:col-span-5">
+        <figure className="rise glow-frame lg:col-span-5">
           <img
             src="/media/noc.jpg"
             alt="اتاق عملیات شبکه ارتباطات گستر ایمن حور"
@@ -101,8 +115,8 @@ function Home() {
           {[
             ["آغاز فعالیت فاز", site.since],
             ["گستره مخابراتی", "۱۰ استان، ۶۵ شهر"],
-            ["پایگاه", "شهرری، فرمانداری"],
-            ["پاسخ تلفنی", phones[0].display],
+            ["پایگاه", address],
+            ["پاسخ تلفنی", phone],
           ].map(([label, value]) => (
             <div key={label} className="bg-raised px-4 py-5">
               <p className="text-xs text-muted">{label}</p>
@@ -265,7 +279,7 @@ function Home() {
           <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-surface p-5">
             <div>
               <p className="font-semibold">برای بازدید فنی همین حالا هماهنگ کنید</p>
-              <p className="mt-1 text-sm text-muted">{site.address}</p>
+              <p className="mt-1 text-sm text-muted">{address}</p>
             </div>
             <Link
               to="/contact"

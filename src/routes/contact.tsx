@@ -1,9 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteShell } from "@/components/shell";
+import { getSettings } from "@/lib/cms.functions";
 import { channels, phones, services, site } from "@/lib/content";
 
+function toTel(raw: string) {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return phones[0].tel;
+  if (digits.startsWith("98")) return `+${digits}`;
+  if (digits.startsWith("0")) return `+98${digits.slice(1)}`;
+  return `+${digits}`;
+}
+
 export const Route = createFileRoute("/contact")({
+  loader: () => getSettings(),
   head: () => ({
     meta: [{ title: "تماس | ارتباطات گستر ایمن حور" }],
   }),
@@ -25,6 +35,12 @@ const STORAGE_KEY = "faz-hoor-inquiries";
 const empty = { name: "", org: "", phone: "", area: services[0]?.title ?? "", message: "" };
 
 function ContactPage() {
+  const settings = Route.useLoaderData();
+  const listed = [
+    settings.phone1 ? { display: settings.phone1, tel: toTel(settings.phone1) } : phones[0],
+    settings.phone2 ? { display: settings.phone2, tel: toTel(settings.phone2) } : phones[1],
+  ];
+  const address = settings.address || site.address;
   const [form, setForm] = useState(empty);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState<Inquiry | null>(null);
@@ -81,7 +97,7 @@ function ContactPage() {
             شماره‌ها تماس بگیرید.
           </p>
           <ul className="mt-6 space-y-3">
-            {phones.map((phone) => (
+            {listed.map((phone) => (
               <li key={phone.tel} className="rounded-card border border-line bg-surface p-4">
                 <a className="text-lg font-semibold text-fg" href={`tel:${phone.tel}`} dir="ltr">
                   {phone.display}
@@ -97,7 +113,7 @@ function ContactPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-sm text-muted">{site.address}</p>
+          <p className="mt-4 text-sm text-muted">{address}</p>
           <p className="mt-1 text-sm text-muted">{site.coverage}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {channels.map((channel) =>

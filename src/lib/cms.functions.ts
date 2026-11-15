@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { articleSeed } from "@/lib/articles-seed";
-import { authMiddleware } from "@/lib/auth/middleware";
 import { getSql } from "@/lib/db";
+import { panelMiddleware } from "@/lib/panel.functions";
 
 const FEEDS = [
   { url: "https://www.cisa.gov/cybersecurity-advisories/all.xml", source: "CISA" },
@@ -51,6 +51,7 @@ type SettingsRow = {
   address: string;
   whatsapp: string;
   banner: string;
+  show_prices: boolean;
 };
 
 async function ensureArticles() {
@@ -66,14 +67,8 @@ async function ensureArticles() {
 
 async function assertAdmin(userId: string) {
   const sql = await getSql();
-  const rows = await sql<{ user_id: string }>`select user_id from admins`;
-  if (rows.length === 0) {
-    await sql`insert into admins (user_id) values (${userId}) on conflict do nothing`;
-    return;
-  }
-  if (!rows.some((row) => row.user_id === userId)) {
-    throw new Error("این حساب مدیر سایت نیست. اولین کسی که وارد شود مدیر می‌شود.");
-  }
+  const rows = await sql<{ username: string }>`select username from panel_users where username = ${userId}`;
+  if (!rows[0]) throw new Error("این حساب مدیر سایت نیست.");
 }
 
 function pickTag(block: string, tag: string) {
@@ -141,9 +136,18 @@ async function refreshNews() {
 
 export const getSettings = createServerFn({ method: "GET" }).handler(async () => {
   const sql = await getSql();
-  const rows = await sql<SettingsRow>`select phone1, phone2, address, whatsapp, banner from site_settings where id = 1`;
+  const rows = await sql<SettingsRow>`
+    select phone1, phone2, address, whatsapp, banner, show_prices from site_settings where id = 1
+  `;
   return (
-    rows[0] ?? { phone1: "", phone2: "", address: "", whatsapp: "", banner: "" }
+    rows[0] ?? {
+      phone1: "",
+      phone2: "",
+      address: "",
+      whatsapp: "",
+      banner: "",
+      show_prices: false,
+    }
   );
 });
 
@@ -225,7 +229,7 @@ export const listNews = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export const adminState = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([panelMiddleware])
   .handler(async ({ context }) => {
     await assertAdmin(context.userId);
     await ensureArticles();
@@ -235,7 +239,7 @@ export const adminState = createServerFn({ method: "GET" })
       sql<TeamRow>`select id, name, role, specialty, photo, sort from team_members order by sort asc, id asc`,
       sql<MediaRow>`select id, kind, ref_id, title, caption, data_url, sort from media order by id desc limit 40`,
       sql<HeadlineRow>`select link, title, source, published_at, hidden from headlines order by fetched_at desc limit 20`,
-      sql<SettingsRow>`select phone1, phone2, address, whatsapp, banner from site_settings where id = 1`,
+      sql<SettingsRow>`select phone1, phone2, address, whatsapp, banner, show_prices from site_settings where id = 1`,
     ]);
     return {
       articles,
@@ -248,7 +252,14 @@ export const adminState = createServerFn({ method: "GET" })
         caption: row.caption,
       })),
       news,
-      settings: settings[0] ?? { phone1: "", phone2: "", address: "", whatsapp: "", banner: "" },
+      settings: settings[0] ?? {
+        phone1: "",
+        phone2: "",
+        address: "",
+        whatsapp: "",
+        banner: "",
+        show_prices: false,
+      },
     };
   });
 
@@ -258,7 +269,7 @@ function cleanText(value: unknown, max: number) {
 }
 
 export const saveSettings = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([panelMiddleware])
   .validator((input: SettingsRow) => input)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
@@ -268,21 +279,23 @@ export const saveSettings = createServerFn({ method: "POST" })
     const address = cleanText(data.address, 160);
     const whatsapp = cleanText(data.whatsapp, 20).replace(/[^\d+]/g, "");
     const banner = cleanText(data.banner, 280);
+    const showPrices = Boolean(data.show_prices);
     await sql`
-      insert into site_settings (id, phone1, phone2, address, whatsapp, banner)
-      values (1, ${phone1}, ${phone2}, ${address}, ${whatsapp}, ${banner})
+      insert into site_settings (id, phone1, phone2, address, whatsapp, banner, show_prices)
+      values (1, ${phone1}, ${phone2}, ${address}, ${whatsapp}, ${banner}, ${showPrices})
       on conflict (id) do update set
         phone1 = excluded.phone1,
         phone2 = excluded.phone2,
         address = excluded.address,
         whatsapp = excluded.whatsapp,
-        banner = excluded.banner
+        banner = excluded.banner,
+        show_prices = excluded.show_prices
     `;
     return { ok: true };
   });
 
 export const addMedia = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([panelMiddleware])
   .validator((input: { kind: string; refId: string; title: string; caption: string; dataUrl: string }) => input)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
@@ -300,7 +313,7 @@ export const addMedia = createServerFn({ method: "POST" })
   });
 
 export const deleteMedia = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([panelMiddleware])
   .validator((id: number) => {
     if (!Number.isInteger(id)) throw new Error("شناسه نامعتبر است.");
     return id;
@@ -313,7 +326,7 @@ export const deleteMedia = createServerFn({ method: "POST" })
   });
 
 export const saveMember = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([panelMiddleware])
   .validator(
     (input: { id?: number; name: string; role: string; specialty: string; photo: string }) => input,
   )
@@ -343,7 +356,7 @@ export const saveMember = createServerFn({ method: "POST" })
   });
 
 export const deleteMember = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([panelMiddleware])
   .validator((id: number) => {
     if (!Number.isInteger(id)) throw new Error("شناسه نامعتبر است.");
     return id;
@@ -356,7 +369,7 @@ export const deleteMember = createServerFn({ method: "POST" })
   });
 
 export const saveArticle = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([panelMiddleware])
   .validator(
     (input: { id?: number; title: string; summary: string; body: string; topic: string }) => input,
   )
@@ -384,7 +397,7 @@ export const saveArticle = createServerFn({ method: "POST" })
   });
 
 export const deleteArticle = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([panelMiddleware])
   .validator((id: number) => {
     if (!Number.isInteger(id)) throw new Error("شناسه نامعتبر است.");
     return id;
@@ -397,7 +410,7 @@ export const deleteArticle = createServerFn({ method: "POST" })
   });
 
 export const setHeadlineHidden = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([panelMiddleware])
   .validator((input: { link: string; hidden: boolean }) => input)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
@@ -405,4 +418,61 @@ export const setHeadlineHidden = createServerFn({ method: "POST" })
     const sql = await getSql();
     await sql`update headlines set hidden = ${Boolean(data.hidden)} where link = ${link}`;
     return { ok: true };
+  });
+
+export const listPrices = createServerFn({ method: "GET" }).handler(async () => {
+  const sql = await getSql();
+  const settings = await sql<{ show_prices: boolean }>`select show_prices from site_settings where id = 1`;
+  if (!settings[0]?.show_prices) return { open: false, items: [] };
+  const items = await sql<{ id: number; title: string; unit: string; amount: string; note: string }>`
+    select id, title, unit, amount, note from prices order by sort asc, id asc
+  `;
+  return { open: true, items };
+});
+
+export const savePrice = createServerFn({ method: "POST" })
+  .middleware([panelMiddleware])
+  .validator((input: { id?: number; title: string; unit: string; amount: string; note: string }) => input)
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const title = cleanText(data.title, 80);
+    const amount = cleanText(data.amount, 40);
+    if (!title || !amount) throw new Error("عنوان و مبلغ را بنویسید.");
+    const sql = await getSql();
+    if (data.id) {
+      await sql`
+        update prices
+        set title = ${title}, unit = ${cleanText(data.unit, 30)}, amount = ${amount}, note = ${cleanText(data.note, 160)}
+        where id = ${data.id}
+      `;
+    } else {
+      await sql`
+        insert into prices (title, unit, amount, note)
+        values (${title}, ${cleanText(data.unit, 30)}, ${amount}, ${cleanText(data.note, 160)})
+      `;
+    }
+    return { ok: true };
+  });
+
+export const deletePrice = createServerFn({ method: "POST" })
+  .middleware([panelMiddleware])
+  .validator((id: number) => {
+    if (!Number.isInteger(id)) throw new Error("شناسه نامعتبر است.");
+    return id;
+  })
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const sql = await getSql();
+    await sql`delete from prices where id = ${data}`;
+    return { ok: true };
+  });
+
+export const adminPrices = createServerFn({ method: "GET" })
+  .middleware([panelMiddleware])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const sql = await getSql();
+    return sql<{ id: number; title: string; unit: string; amount: string; note: string }>`
+      select id, title, unit, amount, note from prices order by sort asc, id asc
+    `;
   });
