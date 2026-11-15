@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteShell } from "@/components/shell";
-import { getGallery, getTeam } from "@/lib/cms.functions";
+import { getGallery, getSettings, getTeam } from "@/lib/cms.functions";
 import { crew, principles, site, tools } from "@/lib/content";
 
 export const Route = createFileRoute("/about")({
@@ -8,21 +8,25 @@ export const Route = createFileRoute("/about")({
     meta: [{ title: "درباره | ارتباطات گستر ایمن حور" }],
   }),
   loader: async () => {
-    const [team, gallery] = await Promise.all([getTeam(), getGallery()]);
-    return { team, groups: gallery.filter((item) => item.kind === "group") };
+    const [team, gallery, settings] = await Promise.all([getTeam(), getGallery(), getSettings()]);
+    return { team, groups: gallery.filter((item) => item.kind === "group"), settings };
   },
   component: AboutPage,
 });
 
 function AboutPage() {
-  const { team, groups } = Route.useLoaderData();
+  const { team, groups, settings } = Route.useLoaderData();
+  const title = settings.title || site.title;
+  const since = settings.since || site.since;
+  const address = settings.address || site.address;
+  const eyebrow = settings.eyebrow || site.eyebrow;
   return (
     <SiteShell>
       <div className="mx-auto max-w-6xl px-4 py-10">
         <p className="font-mono text-xs text-primary" dir="ltr">
           HOOR ICT
         </p>
-        <h1 className="mt-2 text-3xl font-extrabold">{site.title}</h1>
+        <h1 className="mt-2 text-3xl font-extrabold">{title}</h1>
         <p className="mt-3 max-w-2xl text-sm text-muted">
           معرفی خود مجموعه، و کنار آن سوابق فاز الکترونیک که در کاتالوگ اجرایی آمده است. این دو نام ادغام حقوقی
           نشده‌اند.
@@ -33,8 +37,8 @@ function AboutPage() {
             <p className="font-mono text-xs text-primary" dir="ltr">
               HOOR ICT
             </p>
-            <h2 className="mt-2 text-xl font-bold">{site.title}</h2>
-            <p className="mt-1 text-sm text-muted">راهکارهای نوین، ارتباطی مطمئن</p>
+            <h2 className="mt-2 text-xl font-bold">{title}</h2>
+            <p className="mt-1 text-sm text-muted">{eyebrow}</p>
             <p className="mt-4 text-sm text-fg">
               مجری پروژه‌های ارتباطی و مخابراتی با تمرکز بر دکل و تجهیزات رادیویی، ارت و صاعقه‌گیر، برق
               اضطراری، دوربین و کنترل تردد، تعمیر برد مخابراتی و بازیابی اطلاعات. شناسه شبکه‌های اجتماعی{" "}
@@ -55,14 +59,14 @@ function AboutPage() {
             <h2 className="mt-2 text-xl font-bold">فاز الکترونیک</h2>
             <p className="mt-1 text-sm text-muted">نام در جریان ثبت: فناوران امن زیرساخت</p>
             <p className="mt-4 text-sm text-fg">
-              از سال {site.since} در اجرای پروژه‌های فنی زیرساختی، مخابراتی، شبکه، برق و سیستم‌های نظارتی کار
+              از سال {since} در اجرای پروژه‌های فنی زیرساختی، مخابراتی، شبکه، برق و سیستم‌های نظارتی کار
               کرده است. تا تکمیل ثبت، فعالیت با نام تجاری فاز الکترونیک معرفی می‌شود. رویکرد مجموعه، اجرای
               قابل اتکا، رعایت اصول فنی، عیب‌یابی دقیق، راه‌اندازی صحیح و تحویل منظم است.
             </p>
             <dl className="mt-4 grid gap-2 text-sm">
               <div className="flex justify-between gap-3 border-t border-line pt-2">
                 <dt className="text-muted">پایگاه</dt>
-                <dd>{site.address}</dd>
+                <dd>{address}</dd>
               </div>
               <div className="flex justify-between gap-3 border-t border-line pt-2">
                 <dt className="text-muted">گستره</dt>

@@ -35,8 +35,14 @@ function Home() {
   const preview = services.slice(0, 8);
   const recent = projects.slice(0, 4);
   const data = Route.useLoaderData();
-  const address = data.settings.address || site.address;
-  const phone = data.settings.phone1 || phones[0].display;
+  const s = data.settings;
+  const title = s.title || site.title;
+  const headline = s.headline || site.headline;
+  const lede = s.lede || site.lede;
+  const since = s.since || site.since;
+  const address = s.address || site.address;
+  const phone = s.phone1 || phones[0].display;
+  const motto = (s.motto ? s.motto.split(/[,،]/).map((w) => w.trim()).filter(Boolean) : site.motto);
   const shots = [
     ...specialtyShots.map((shot) => ({ ...shot })),
     ...data.gallery
@@ -52,12 +58,12 @@ function Home() {
             HOOR ICT
           </p>
           <h1 className="rise mt-3 text-3xl font-extrabold leading-tight text-fg sm:text-4xl">
-            {site.title}
+            {title}
           </h1>
-          <p className="rise mt-3 text-lg font-medium text-fg">{site.headline}</p>
-          <p className="rise mt-4 max-w-xl text-base text-muted">{site.lede}</p>
+          <p className="rise mt-3 text-lg font-medium text-fg">{headline}</p>
+          <p className="rise mt-4 max-w-xl text-base text-muted">{lede}</p>
           <div className="rise mt-6 flex flex-wrap gap-2">
-            {site.motto.map((word) => (
+            {motto.map((word) => (
               <span
                 key={word}
                 className="rounded-full border border-line bg-surface px-3 py-1 text-sm text-fg"
@@ -68,7 +74,7 @@ function Home() {
           </div>
           <div className="rise mt-7 flex flex-wrap gap-3">
             <a
-              href={`tel:${data.settings.phone1 ? toTel(data.settings.phone1) : phones[0].tel}`}
+              href={`tel:${s.phone1 ? toTel(s.phone1) : phones[0].tel}`}
               className="tap shine inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-ink"
             >
               تماس فوری
@@ -113,7 +119,7 @@ function Home() {
       <section className="border-y border-line bg-raised">
         <div className="mx-auto grid max-w-6xl gap-px bg-line sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ["آغاز فعالیت فاز", site.since],
+            ["آغاز فعالیت", since],
             ["گستره مخابراتی", "۱۰ استان، ۶۵ شهر"],
             ["پایگاه", address],
             ["پاسخ تلفنی", phone],

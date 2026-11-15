@@ -52,6 +52,13 @@ type SettingsRow = {
   whatsapp: string;
   banner: string;
   show_prices: boolean;
+  title: string;
+  eyebrow: string;
+  headline: string;
+  lede: string;
+  motto: string;
+  since: string;
+  coverage: string;
 };
 
 async function ensureArticles() {
@@ -137,7 +144,9 @@ async function refreshNews() {
 export const getSettings = createServerFn({ method: "GET" }).handler(async () => {
   const sql = await getSql();
   const rows = await sql<SettingsRow>`
-    select phone1, phone2, address, whatsapp, banner, show_prices from site_settings where id = 1
+    select phone1, phone2, address, whatsapp, banner, show_prices,
+           title, eyebrow, headline, lede, motto, since, coverage
+    from site_settings where id = 1
   `;
   return (
     rows[0] ?? {
@@ -147,6 +156,13 @@ export const getSettings = createServerFn({ method: "GET" }).handler(async () =>
       whatsapp: "",
       banner: "",
       show_prices: false,
+      title: "",
+      eyebrow: "",
+      headline: "",
+      lede: "",
+      motto: "",
+      since: "",
+      coverage: "",
     }
   );
 });
@@ -239,7 +255,9 @@ export const adminState = createServerFn({ method: "GET" })
       sql<TeamRow>`select id, name, role, specialty, photo, sort from team_members order by sort asc, id asc`,
       sql<MediaRow>`select id, kind, ref_id, title, caption, data_url, sort from media order by id desc limit 40`,
       sql<HeadlineRow>`select link, title, source, published_at, hidden from headlines order by fetched_at desc limit 20`,
-      sql<SettingsRow>`select phone1, phone2, address, whatsapp, banner, show_prices from site_settings where id = 1`,
+      sql<SettingsRow>`select phone1, phone2, address, whatsapp, banner, show_prices,
+                              title, eyebrow, headline, lede, motto, since, coverage
+                       from site_settings where id = 1`,
     ]);
     return {
       articles,
@@ -259,6 +277,13 @@ export const adminState = createServerFn({ method: "GET" })
         whatsapp: "",
         banner: "",
         show_prices: false,
+        title: "",
+        eyebrow: "",
+        headline: "",
+        lede: "",
+        motto: "",
+        since: "",
+        coverage: "",
       },
     };
   });
@@ -280,16 +305,36 @@ export const saveSettings = createServerFn({ method: "POST" })
     const whatsapp = cleanText(data.whatsapp, 20).replace(/[^\d+]/g, "");
     const banner = cleanText(data.banner, 280);
     const showPrices = Boolean(data.show_prices);
+    const title = cleanText(data.title, 120);
+    const eyebrow = cleanText(data.eyebrow, 120);
+    const headline = cleanText(data.headline, 220);
+    const lede = cleanText(data.lede, 600);
+    const motto = cleanText(data.motto, 120);
+    const since = cleanText(data.since, 20);
+    const coverage = cleanText(data.coverage, 220);
     await sql`
-      insert into site_settings (id, phone1, phone2, address, whatsapp, banner, show_prices)
-      values (1, ${phone1}, ${phone2}, ${address}, ${whatsapp}, ${banner}, ${showPrices})
+      insert into site_settings (
+        id, phone1, phone2, address, whatsapp, banner, show_prices,
+        title, eyebrow, headline, lede, motto, since, coverage
+      )
+      values (
+        1, ${phone1}, ${phone2}, ${address}, ${whatsapp}, ${banner}, ${showPrices},
+        ${title}, ${eyebrow}, ${headline}, ${lede}, ${motto}, ${since}, ${coverage}
+      )
       on conflict (id) do update set
         phone1 = excluded.phone1,
         phone2 = excluded.phone2,
         address = excluded.address,
         whatsapp = excluded.whatsapp,
         banner = excluded.banner,
-        show_prices = excluded.show_prices
+        show_prices = excluded.show_prices,
+        title = excluded.title,
+        eyebrow = excluded.eyebrow,
+        headline = excluded.headline,
+        lede = excluded.lede,
+        motto = excluded.motto,
+        since = excluded.since,
+        coverage = excluded.coverage
     `;
     return { ok: true };
   });

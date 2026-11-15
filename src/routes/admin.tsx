@@ -483,7 +483,27 @@ function SettingsForm({
   }
   return (
     <section className="mt-5 grid gap-3">
-      <p className="text-sm text-muted">اگر خالی بماند، شماره و آدرس کاتالوگ نشان داده می‌شود.</p>
+      <p className="text-sm font-medium text-ink">متن‌های اصلی سایت</p>
+      <p className="text-xs text-muted">اگر خالی بماند، مقدار پیش‌فرض کاتالوگ نشان داده می‌شود.</p>
+      <input className={field} placeholder="عنوان سایت (title)" value={form.title || ""} onChange={(e) => set("title", e.target.value)} />
+      <input className={field} placeholder="زیرعنوان کوتاه (eyebrow)" value={form.eyebrow || ""} onChange={(e) => set("eyebrow", e.target.value)} />
+      <textarea
+        className="min-h-20 w-full rounded-xl border border-line bg-bg px-3 py-2 text-base"
+        placeholder="تیتر اصلی صفحه خانه (headline)"
+        value={form.headline || ""}
+        onChange={(e) => set("headline", e.target.value)}
+      />
+      <textarea
+        className="min-h-28 w-full rounded-xl border border-line bg-bg px-3 py-2 text-base"
+        placeholder="توضیح معرفی (lede)"
+        value={form.lede || ""}
+        onChange={(e) => set("lede", e.target.value)}
+      />
+      <input className={field} placeholder="شعارها با ویرگول، مثل: هوشمند،مطمئن،پایدار" value={form.motto || ""} onChange={(e) => set("motto", e.target.value)} />
+      <input className={field} placeholder="سال آغاز فعالیت، مثل ۱۴۰۴" value={form.since || ""} onChange={(e) => set("since", e.target.value)} />
+      <input className={field} placeholder="پوشش جغرافیایی" value={form.coverage || ""} onChange={(e) => set("coverage", e.target.value)} />
+
+      <p className="mt-4 text-sm font-medium text-ink">تماس و بنر</p>
       <input className={field} placeholder="تلفن اول" value={form.phone1} onChange={(e) => set("phone1", e.target.value)} />
       <input className={field} placeholder="تلفن دوم" value={form.phone2} onChange={(e) => set("phone2", e.target.value)} />
       <input className={field} placeholder="آدرس" value={form.address} onChange={(e) => set("address", e.target.value)} />
@@ -515,7 +535,7 @@ function SettingsForm({
           onError("");
           try {
             await saveSettings({ data: form });
-            onNote("اطلاعات تماس ذخیره شد.");
+            onNote("تنظیمات سایت ذخیره شد.");
             await onDone();
           } catch (reason) {
             onError(reason instanceof Error ? reason.message : "ذخیره نشد.");
