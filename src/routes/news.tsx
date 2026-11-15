@@ -13,21 +13,14 @@ function NewsPage() {
   return (
     <SiteShell>
       <div className="mx-auto max-w-3xl px-4 py-10">
-        <p className="font-mono text-xs text-primary" dir="ltr">
-          NEWS
-        </p>
-        <h1 className="mt-2 text-3xl font-extrabold">خبر ایمنی و فناوری</h1>
-        <p className="mt-3 text-sm text-muted">
-          عنوان‌ها هر چند ساعت از منابع عمومی امنیت سایبری گرفته می‌شود. متن خبر مال آن سایت است و اینجا کپی
-          نشده؛ برای خواندن به همان منبع بروید. اگر منبع در دسترس نباشد، فهرست قبلی می‌ماند.
-        </p>
+        <h1 className="text-3xl font-extrabold">خبر ایمنی و فناوری</h1>
         {items.length === 0 ? (
           <p className="mt-8 rounded-card border border-line bg-surface p-4 text-sm">
-            الان عنوان تازه‌ای نرسید. راهنماهای خود مجموعه در{" "}
+            خبر تازه‌ای ثبت نشده است. می‌توانید{" "}
             <Link to="/articles" className="text-primary">
               مقالات
             </Link>{" "}
-            هست.
+            را ببینید.
           </p>
         ) : (
           <ul className="mt-6 grid gap-3">

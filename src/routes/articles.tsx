@@ -14,10 +14,7 @@ function ArticlesPage() {
   return (
     <SiteShell>
       <div className="mx-auto max-w-3xl px-4 py-10">
-        <p className="font-mono text-xs text-primary" dir="ltr">
-          GUIDES
-        </p>
-        <h1 className="mt-2 text-3xl font-extrabold">مقالات ایمنی و فناوری</h1>
+        <h1 className="text-3xl font-extrabold">مقالات ایمنی و فناوری</h1>
         <p className="mt-3 text-sm text-muted">
           راهنماهای فنی و ایمنی بر پایه تجربه اجرایی در پروژه‌های مخابراتی، شبکه و نظارت تصویری.
         </p>

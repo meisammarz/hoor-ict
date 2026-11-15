@@ -30,12 +30,9 @@ function LoginPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-8">
-      <p className="font-mono text-xs text-primary" dir="ltr">
-        ADMIN
-      </p>
-      <h1 className="mt-2 text-2xl font-extrabold">ورود به پنل</h1>
+      <h1 className="text-2xl font-extrabold">ورود به پنل</h1>
       <p className="mt-2 text-sm text-muted">
-        فقط حساب‌های ساخته‌شده توسط مدیر وارد می‌شوند. نام کاربری و رمز اولیه در فایل راهنمای خصوصی است.
+        برای ورود، نام کاربری و رمز عبور خود را وارد کنید.
       </p>
       <form className="mt-6 grid gap-3" onSubmit={submit}>
         <input

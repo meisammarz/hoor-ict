@@ -23,20 +23,14 @@ function AboutPage() {
   return (
     <SiteShell>
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <p className="font-mono text-xs text-primary" dir="ltr">
-          HOOR ICT
-        </p>
-        <h1 className="mt-2 text-3xl font-extrabold">{title}</h1>
+        <h1 className="text-3xl font-extrabold">{title}</h1>
         <p className="mt-3 max-w-2xl text-sm text-muted">
           معرفی مجموعه و سوابق اجرایی مرتبط با پروژه‌های زیرساختی، مخابراتی و ایمنی.
         </p>
 
         <div className="mt-8 grid gap-4 lg:grid-cols-2">
           <article className="rounded-card border border-line bg-surface p-5">
-            <p className="font-mono text-xs text-primary" dir="ltr">
-              HOOR ICT
-            </p>
-            <h2 className="mt-2 text-xl font-bold">{title}</h2>
+            <h2 className="text-xl font-bold">{title}</h2>
             <p className="mt-1 text-sm text-muted">{eyebrow}</p>
             <p className="mt-4 text-sm text-fg">
               مجری پروژه‌های ارتباطی و مخابراتی با تمرکز بر دکل و تجهیزات رادیویی، ارت و صاعقه‌گیر، برق
@@ -52,10 +46,7 @@ function AboutPage() {
           </article>
 
           <article className="rounded-card border border-line bg-surface p-5">
-            <p className="font-mono text-xs text-primary" dir="ltr">
-              FAZ ELECTRONIC
-            </p>
-            <h2 className="mt-2 text-xl font-bold">فاز الکترونیک</h2>
+            <h2 className="text-xl font-bold">فاز الکترونیک</h2>
             <p className="mt-1 text-sm text-muted">نام در جریان ثبت: فناوران امن زیرساخت</p>
             <p className="mt-4 text-sm text-fg">
               از سال {since} در اجرای پروژه‌های فنی زیرساختی، مخابراتی، شبکه، برق و سیستم‌های نظارتی کار

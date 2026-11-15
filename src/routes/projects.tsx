@@ -22,10 +22,7 @@ function ProjectsPage() {
   return (
     <SiteShell>
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <p className="font-mono text-xs text-primary" dir="ltr">
-          FIELD RECORD
-        </p>
-        <h1 className="mt-2 text-3xl font-extrabold">سوابق و تجربه‌های اجرایی</h1>
+        <h1 className="text-3xl font-extrabold">سوابق و تجربه‌های اجرایی</h1>
         <p className="mt-3 max-w-2xl text-sm text-muted">
           نمونه‌ای از پروژه‌های اجراشده در حوزه‌های مخابرات، شبکه، ایمنی، برق و نگهداری — در تهران و سایر نقاط کشور.
         </p>
@@ -55,8 +52,8 @@ function ProjectsPage() {
               id={project.id}
               className="scroll-mt-28 grid gap-3 rounded-card border border-line bg-surface p-5 sm:grid-cols-[5rem_1fr]"
             >
-              <p className="font-mono text-sm text-primary" dir="ltr">
-                {String(index + 1).padStart(2, "0")}
+              <p className="text-sm text-primary">
+                {index + 1}
               </p>
               <div>
                 <div className="flex flex-wrap items-baseline justify-between gap-2">

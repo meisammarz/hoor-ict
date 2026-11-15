@@ -32,10 +32,7 @@ function ServicesPage() {
   return (
     <SiteShell>
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <p className="font-mono text-xs text-primary" dir="ltr">
-          CATALOG
-        </p>
-        <h1 className="mt-2 text-3xl font-extrabold">خدمات تخصصی</h1>
+        <h1 className="text-3xl font-extrabold">خدمات تخصصی</h1>
         <p className="mt-3 max-w-2xl text-sm text-muted">
           خدمات اجرایی در حوزه‌های مخابرات، شبکه، نظارت تصویری، برق و ایمنی — با امکان فیلتر بر اساس حوزه تخصصی.
         </p>
@@ -120,7 +117,7 @@ function ServicesPage() {
                       <ServiceIcon name={item.icon} className="size-5" />
                     </span>
                     <div>
-                      <p className="font-mono text-xs text-primary">{item.index}</p>
+                      <p className="text-xs text-primary">{item.index}</p>
                       <h2 className="text-lg font-bold">{item.title}</h2>
                     </div>
                   </div>

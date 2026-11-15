@@ -88,10 +88,7 @@ function ContactPage() {
     <SiteShell>
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-12">
         <div className="lg:col-span-5">
-          <p className="font-mono text-xs text-primary" dir="ltr">
-            INTAKE
-          </p>
-          <h1 className="mt-2 text-3xl font-extrabold">درخواست بررسی</h1>
+          <h1 className="text-3xl font-extrabold">درخواست بررسی</h1>
           <p className="mt-3 text-sm text-muted">
             برای بررسی مسیر، برآورد یا هماهنگی بازدید، با شماره‌های زیر تماس بگیرید یا پیام بگذارید.
           </p>

@@ -13,10 +13,7 @@ function PricesPage() {
   return (
     <SiteShell>
       <div className="mx-auto max-w-3xl px-4 py-10">
-        <p className="font-mono text-xs text-primary" dir="ltr">
-          RATES
-        </p>
-        <h1 className="mt-2 text-3xl font-extrabold">لیست قیمت</h1>
+        <h1 className="text-3xl font-extrabold">لیست قیمت</h1>
         {!data.open ? (
           <p className="mt-4 text-sm text-muted">
             فهرست قیمت فعلاً نمایش داده نمی‌شود. برای برآورد همان پروژه با ما تماس بگیرید.

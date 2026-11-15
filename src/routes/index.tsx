@@ -54,10 +54,7 @@ function Home() {
     <SiteShell>
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-12 lg:items-center lg:py-16">
         <div className="lg:col-span-7">
-          <p className="rise font-mono text-xs tracking-widest text-primary" dir="ltr">
-            HOOR ICT
-          </p>
-          <h1 className="rise mt-3 text-3xl font-extrabold leading-tight text-fg sm:text-4xl">
+          <h1 className="rise text-3xl font-extrabold leading-tight text-fg sm:text-4xl">
             {title}
           </h1>
           <p className="rise mt-3 text-lg font-medium text-fg">{headline}</p>
@@ -103,10 +100,7 @@ function Home() {
       <section className="mx-auto max-w-6xl px-4 py-12">
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-xs text-primary" dir="ltr">
-              FIELD
-            </p>
-            <h2 className="mt-2 text-2xl font-bold">تخصص‌ها، در تصویر</h2>
+            <h2 className="text-2xl font-bold">تخصص‌ها، در تصویر</h2>
           </div>
           <Link to="/services" className="text-sm text-primary">
             جزئیات خدمات
@@ -134,10 +128,7 @@ function Home() {
       <section className="mx-auto max-w-6xl px-4 py-14">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-xs text-primary" dir="ltr">
-              01 — SERVICES
-            </p>
-            <h2 className="mt-2 text-2xl font-bold">خدمات در یک نگاه</h2>
+            <h2 className="text-2xl font-bold">خدمات در یک نگاه</h2>
           </div>
           <Link to="/services" className="text-sm text-primary">
             هر ۱۲ مورد
@@ -172,10 +163,7 @@ function Home() {
       <section className="bg-raised">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <p className="font-mono text-xs text-primary" dir="ltr">
-              02 — RECORD
-            </p>
-            <h2 className="mt-2 text-2xl font-bold">سوابق اجرایی فاز الکترونیک</h2>
+            <h2 className="text-2xl font-bold">سوابق اجرایی</h2>
             <p className="mt-3 text-sm text-muted">
               گوشه‌ای از پروژه‌های اجراشده؛ جزئیات هر قرارداد پس از بررسی مسیر ارائه می‌شود.
             </p>
@@ -214,7 +202,7 @@ function Home() {
           </div>
           <ul className="mt-4 grid gap-3">
             {data.news.length === 0 ? (
-              <li className="text-sm text-muted">عنوان تازه‌ای از منابع بیرونی نرسید.</li>
+              <li className="text-sm text-muted">خبر تازه‌ای ثبت نشده است.</li>
             ) : (
               data.news.map((item) => (
                 <li key={item.link} className="rounded-card border border-line bg-surface p-4">
@@ -252,16 +240,11 @@ function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14">
-        <p className="font-mono text-xs text-primary" dir="ltr">
-          03 — METHOD
-        </p>
-        <h2 className="mt-2 text-2xl font-bold">نه گام تا تحویل</h2>
+        <h2 className="text-2xl font-bold">نه گام تا تحویل</h2>
         <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {steps.map((step, index) => (
             <li key={step} className="rounded-card border border-line bg-surface p-4">
-              <span className="font-mono text-xs text-primary" dir="ltr">
-                {String(index + 1).padStart(2, "0")}
-              </span>
+              <span className="text-xs text-primary">{index + 1}</span>
               <p className="mt-2 text-sm font-medium">{step}</p>
             </li>
           ))}
