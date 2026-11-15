@@ -113,7 +113,6 @@ function Home() {
           </Link>
         </div>
         <PhotoRail shots={shots} />
-        <p className="mt-3 text-xs text-muted">نوار عکس آرام حرکت می‌کند. با لمس، مکث می‌کند. عکس تازه را از پنل می‌گذارید.</p>
       </section>
 
       <section className="border-y border-line bg-raised">
@@ -178,7 +177,7 @@ function Home() {
             </p>
             <h2 className="mt-2 text-2xl font-bold">سوابق اجرایی فاز الکترونیک</h2>
             <p className="mt-3 text-sm text-muted">
-              نمونه‌ها از کاتالوگ معرفی مجموعه است؛ جزئیات قراردادی هر پروژه جداگانه ارائه می‌شود.
+              گوشه‌ای از پروژه‌های اجراشده؛ جزئیات هر قرارداد پس از بررسی مسیر ارائه می‌شود.
             </p>
             <Link
               to="/projects"

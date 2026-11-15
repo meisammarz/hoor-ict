@@ -93,8 +93,7 @@ function ContactPage() {
           </p>
           <h1 className="mt-2 text-3xl font-extrabold">درخواست بررسی</h1>
           <p className="mt-3 text-sm text-muted">
-            در این پیش‌نمایش، فرم به سرور فرستاده نمی‌شود و فقط روی همین مرورگر می‌ماند. برای هماهنگی واقعی با
-            شماره‌ها تماس بگیرید.
+            برای بررسی مسیر، برآورد یا هماهنگی بازدید، با شماره‌های زیر تماس بگیرید یا پیام بگذارید.
           </p>
           <ul className="mt-6 space-y-3">
             {listed.map((phone) => (

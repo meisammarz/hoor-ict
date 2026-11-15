@@ -37,8 +37,7 @@ function ServicesPage() {
         </p>
         <h1 className="mt-2 text-3xl font-extrabold">خدمات تخصصی</h1>
         <p className="mt-3 max-w-2xl text-sm text-muted">
-          هر کارت مشخص می‌کند کار از کاتالوگ فاز الکترونیک است، از معرفی ایمن حور، یا در هر دو مجموعه آمده
-          است. فیلتر را عوض کنید تا هم‌پوشانی را ببینید.
+          خدمات اجرایی در حوزه‌های مخابرات، شبکه، نظارت تصویری، برق و ایمنی — با امکان فیلتر بر اساس حوزه تخصصی.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="حوزه">

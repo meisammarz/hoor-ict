@@ -30,6 +30,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState(phones[0].tel);
   const [showPrices, setShowPrices] = useState(false);
+  const [title, setTitle] = useState(site.title);
+  const [coverage, setCoverage] = useState(site.coverage);
+  const [address, setAddress] = useState(site.address);
+  const [phoneList, setPhoneList] = useState(phones.map((p) => ({ display: p.display, tel: p.tel })));
 
   useEffect(() => {
     void getSettings()
@@ -38,6 +42,18 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         setWhatsapp(settings.whatsapp);
         setShowPrices(Boolean(settings.show_prices));
         if (settings.phone1) setPhone(toTel(settings.phone1));
+        if (settings.title) setTitle(settings.title);
+        if (settings.coverage) setCoverage(settings.coverage);
+        if (settings.address) setAddress(settings.address);
+
+        const nextPhones: { display: string; tel: string }[] = [];
+        if (settings.phone1?.trim()) {
+          nextPhones.push({ display: settings.phone1.trim(), tel: toTel(settings.phone1) });
+        }
+        if (settings.phone2?.trim()) {
+          nextPhones.push({ display: settings.phone2.trim(), tel: toTel(settings.phone2) });
+        }
+        if (nextPhones.length) setPhoneList(nextPhones);
       })
       .catch(() => undefined);
   }, []);
@@ -45,20 +61,19 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const nav = showPrices ? [...links.slice(0, 2), { to: "/prices", label: "قیمت" }, ...links.slice(2)] : links;
 
   return (
-    <div className="min-h-screen bg-bg text-fg">
-      <div className="border-b border-line bg-raised text-muted">
-        <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-2 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <p>{banner || site.staging}</p>
-          <p className="shrink-0 font-mono text-xs tracking-wide text-primary" dir="ltr">
-            STAGING
-          </p>
+    <div className="min-h-screen overflow-x-hidden bg-bg text-fg">
+      {banner ? (
+        <div className="border-b border-line bg-raised text-muted">
+          <div className="mx-auto max-w-6xl px-4 py-2 text-sm">
+            <p className="break-words">{banner}</p>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <header className="sticky top-0 z-30 border-b border-line bg-bg/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <Link to="/" className="min-w-0" onClick={() => setOpen(false)}>
-            <span className="block text-sm font-semibold text-fg">{site.title}</span>
+            <span className="block truncate text-sm font-semibold text-fg">{title}</span>
             <span className="block font-mono text-xs text-muted" dir="ltr">
               {site.socialHandle}
             </span>
@@ -128,25 +143,25 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
       <footer className="mt-16 border-t border-line bg-raised">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="sm:col-span-2">
-            <p className="text-sm font-semibold">{site.title}</p>
+          <div className="min-w-0 sm:col-span-2">
+            <p className="text-sm font-semibold">{title}</p>
             <p className="mt-1 text-sm text-muted">مجری پروژه‌های ارتباطی و مخابراتی</p>
-            <p className="mt-3 max-w-md text-sm text-muted">{site.coverage}</p>
+            <p className="mt-3 max-w-md break-words text-sm text-muted">{coverage}</p>
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs text-muted">تلفن</p>
             <ul className="mt-2 space-y-1">
-              {phones.map((phone) => (
-                <li key={phone.tel}>
-                  <a className="text-sm text-fg hover:text-primary" href={`tel:${phone.tel}`} dir="ltr">
-                    {phone.display}
+              {phoneList.map((item) => (
+                <li key={item.tel}>
+                  <a className="text-sm text-fg hover:text-primary" href={`tel:${item.tel}`} dir="ltr">
+                    {item.display}
                   </a>
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-sm text-muted">{site.address}</p>
+            <p className="mt-3 break-words text-sm text-muted">{address}</p>
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs text-muted">ایمن حور</p>
             <a
               className="mt-2 block font-mono text-sm text-primary"
@@ -164,7 +179,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         </div>
         <div className="border-t border-line">
           <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted">
-            پیش‌نمایش ۱۴۰۵. پس از تأیید شما می‌توان سایت را منتشر کرد؛ تا آن زمان دامنه اصلی دست نمی‌خورد.
+            © ارتباطات گستر ایمن حور — تمامی حقوق محفوظ است.
           </p>
         </div>
       </footer>

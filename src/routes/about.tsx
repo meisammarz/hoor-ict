@@ -28,8 +28,7 @@ function AboutPage() {
         </p>
         <h1 className="mt-2 text-3xl font-extrabold">{title}</h1>
         <p className="mt-3 max-w-2xl text-sm text-muted">
-          معرفی خود مجموعه، و کنار آن سوابق فاز الکترونیک که در کاتالوگ اجرایی آمده است. این دو نام ادغام حقوقی
-          نشده‌اند.
+          معرفی مجموعه و سوابق اجرایی مرتبط با پروژه‌های زیرساختی، مخابراتی و ایمنی.
         </p>
 
         <div className="mt-8 grid gap-4 lg:grid-cols-2">
@@ -81,9 +80,9 @@ function AboutPage() {
         </div>
 
         <section className="mt-10">
-          <h2 className="text-2xl font-bold">اعضا و عکس جمعی</h2>
+          <h2 className="text-2xl font-bold">تیم اجرایی</h2>
           <p className="mt-2 max-w-2xl text-sm text-muted">
-            چهره و تخصص را فقط از پنل می‌گذارید. تا قبل از بارگذاری، سایت عکس ساختگی از افراد نشان نمی‌دهد.
+            بخشی از همکاران فنی و اجرایی مجموعه در حوزه‌های مخابرات، شبکه و ایمنی.
           </p>
           {groups.length > 0 ? (
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -97,7 +96,7 @@ function AboutPage() {
           ) : null}
           {team.length === 0 ? (
             <p className="mt-4 rounded-card border border-dashed border-line p-4 text-sm text-muted">
-              هنوز عضوی ثبت نشده. از پایین سایت، پنل مدیریت، بخش تیم.
+              معرفی اعضای تیم به‌زودی تکمیل می‌شود.
             </p>
           ) : (
             <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
